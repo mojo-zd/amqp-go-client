@@ -1,17 +1,31 @@
 package buzz
 
 import (
-// "encoding/json"
-// "log"
-// ml "models"
+	ct "constants"
+	"jpush"
+	ml "models"
 )
 
-// func WorkflowExcutor(buzzBody ml.AMQPBuzzBody, action string) {
+func WorkflowExcutor(amqp ml.AMQPMessage) {
+	// JPush发送通知到客户端
+	jpush.PushMessage(amqp, ct.WorkflowType, workflowTitleConcat(&amqp))
+}
 
-// 	var wreport ml.WReport
-// 	err := json.Unmarshal([]byte(amqp.Obj), &wreport)
-// 	if err != nil {
-// 		log.Printf("json解析错误", err)
-// 	}
-// 	log.Printf("操作类型, 输出内容 title is %s, uuid is %s ", amqp.OperationType, wreport.Title, wreport.UUID)
-// }
+func workflowTitleConcat(amqp *ml.AMQPMessage) string {
+	title := ""
+	switch {
+	case amqp.OperationType == ct.Create:
+		title = amqp.BuzzBody.SenderName + ct.WFSubmit + amqp.BuzzBody.Title
+	case amqp.OperationType == ct.WillExpire:
+		// 提示在时间段内办理
+		//title = amqp.BuzzBody.SenderName + ct.WFSubmit + amqp.BuzzBody.Title
+	case amqp.OperationType == ct.Accept:
+		title = ct.WFYour + amqp.BuzzBody.Title + ct.WFAccept
+	case amqp.OperationType == ct.Done:
+		title = ct.WFYour + amqp.BuzzBody.Title + ct.WFDone
+	case amqp.OperationType == ct.Reject:
+		title = ct.WFYour + amqp.BuzzBody.Title + ct.WFFailed
+	}
+
+	return title
+}

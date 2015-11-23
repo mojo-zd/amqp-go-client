@@ -7,10 +7,11 @@ import (
 	ml "models"
 )
 
-func PushMessage(amqp ml.AMQPMessage, btype int) {
+func PushMessage(amqp ml.AMQPMessage, btype int, title string) {
 
 	var pf jpushclient.Platform
-	pf.All()
+	pf.Add(jpushclient.ANDROID)
+	pf.Add(jpushclient.IOS)
 
 	//Audience
 	var ad jpushclient.Audience
@@ -24,10 +25,9 @@ func PushMessage(amqp ml.AMQPMessage, btype int) {
 	extras["buzzType"] = btype
 	extras["operationType"] = amqp.OperationType
 
-	notice.SetAlert("alert_test")
-	notice.SetAndroidNotice(&jpushclient.AndroidNotice{Alert: "谷歌服务", Title: amqp.BuzzBody.Title, BuilderId: 1, Extras: extras})
-	notice.SetIOSNotice(&jpushclient.IOSNotice{Alert: "苹果一打", Sound: "default", Badge: 4, Extras: extras})
-	notice.SetWinPhoneNotice(&jpushclient.WinPhoneNotice{Alert: "WinPhoneNotice"})
+	notice.SetAndroidNotice(&jpushclient.AndroidNotice{Alert: title, Title: amqp.BuzzBody.Title, BuilderId: +1, Extras: extras})
+	notice.SetIOSNotice(&jpushclient.IOSNotice{Alert: title, Sound: "default", Badge: +1, Extras: extras})
+	// notice.SetWinPhoneNotice(&jpushclient.WinPhoneNotice{Alert: "WinPhoneNotice"})
 
 	var msg jpushclient.Message
 	msg.Title = amqp.BuzzBody.Title

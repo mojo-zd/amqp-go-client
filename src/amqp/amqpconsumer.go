@@ -67,13 +67,19 @@ func ReceiveMessage() {
 
 func analyze(amqp ml.AMQPMessage) {
 
+	utils.Display("从消息服务器接收到的数据", amqp)
+	// 如果没有接受对象则不进行消息发送
+	if amqp.BuzzBody.Receivers == nil {
+		return
+	}
+
 	switch {
 	case ct.BuzzTask == amqp.BuzzType:
 		buzz.TaskExcutor(amqp)
 	case ct.BuzzReport == amqp.BuzzType:
 		buzz.ReportExcutor(amqp)
 	case ct.BuzzWorkflow == amqp.BuzzType:
-		//buzz.WorkflowExcutor(buzzBody, amqp.OperationType, amqp.BuzzType)
+		buzz.WorkflowExcutor(amqp)
 	default:
 
 	}
