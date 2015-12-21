@@ -24,14 +24,8 @@ func PushMessage(amqp ml.AMQPMessage, btype int, title string) {
 	extras["buzzType"] = btype
 	extras["operationType"] = amqp.OperationType
 
-<<<<<<< HEAD:jpush/jpushclient.go
 	notice.SetAndroidNotice(&jpushclient.AndroidNotice{Alert: title, Title: amqp.BuzzBody.NotifyBuzz.Title, BuilderId: +1, Extras: extras})
 	notice.SetIOSNotice(&jpushclient.IOSNotice{Alert: title, Sound: "default", Badge: +1, Extras: extras})
-=======
-	notice.SetAndroidNotice(&jpushclient.AndroidNotice{Alert: title, Title: amqp.BuzzBody.Title, BuilderId: +1, Extras: extras})
-	notice.SetIOSNotice(&jpushclient.IOSNotice{Alert: title, Sound: "default", Badge: +1, Extras: extras})
-	// notice.SetWinPhoneNotice(&jpushclient.WinPhoneNotice{Alert: "WinPhoneNotice"})
->>>>>>> d3d6b3ae4f8438c0065d46605d5ccd2de458f7e2:src/jpush/jpushclient.go
 
 	var msg jpushclient.Message
 	msg.Title = amqp.BuzzBody.NotifyBuzz.Title

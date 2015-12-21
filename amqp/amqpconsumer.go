@@ -2,36 +2,44 @@ package amqp
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/utils"
+	"fmt"
 	"github.com/streadway/amqp"
 	"log"
 	ml "loyocloud-infrastructure/tmodels"
-	util "loyocloud-infrastructure/utils"
+	ct "loyocloud-notify-client/constants"
+
+	"github.com/astaxie/beego/utils"
 )
 
 type AmqpMessageInterface interface {
 	Analyse(amqp ml.AMQPMessage)
 }
 
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+		panic(fmt.Sprintf("%s: %s", msg, err))
+	}
+}
+
 func ReceiveMessage(queueName string, amqpMessage AmqpMessageInterface) {
-	//ml.DeptAndChildDept
-	conn, err := amqp.Dial(ml.AMQPUrl)
-	util.FailOnError(err, "Failed to connect to RabbitMQ")
+	conn, err := amqp.Dial(ct.AMQPUrl)
+	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	util.FailOnError(err, "Failed to open a channel")
+	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
 		queueName,    // name
-		ml.Durable,   // durable
-		ml.Deleted,   // delete when usused
-		ml.Exclusive, // exclusive
-		ml.NoWait,    // no-wait
+		ct.Durable,   // durable
+		ct.Deleted,   // delete when usused
+		ct.Exclusive, // exclusive
+		ct.NoWait,    // no-wait
 		nil,          // arguments
 	)
-	util.FailOnError(err, "Failed to declare a queue")
+	failOnError(err, "Failed to declare a queue")
 
 	msgs, err := ch.Consume(
 		q.Name, // queue
@@ -42,7 +50,7 @@ func ReceiveMessage(queueName string, amqpMessage AmqpMessageInterface) {
 		false,  // no-wait
 		nil,    // args
 	)
-	util.FailOnError(err, "Failed to register a consumer")
+	failOnError(err, "Failed to register a consumer")
 
 	forever := make(chan bool)
 
@@ -53,7 +61,6 @@ func ReceiveMessage(queueName string, amqpMessage AmqpMessageInterface) {
 				utils.Display("从消息服务器获取到得数据", amqp)
 			}
 			amqpMessage.Analyse(amqp)
-			//analyze(amqp)
 		}
 	}()
 

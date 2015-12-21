@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/astaxie/beego/utils"
 	ml "loyocloud-infrastructure/tmodels"
+	bizType "loyocloud-infrastructure/tmodels/enum/biztype"
 	"loyocloud-notify-client/amqp"
 	"loyocloud-notify-client/buzz"
 )
@@ -18,11 +19,11 @@ func (this AmqpNotify) Analyse(amqp ml.AMQPMessage) {
 	}
 
 	switch {
-	case ml.BuzzTask == amqp.BuzzType:
+	case bizType.Task == amqp.BuzzType:
 		buzz.TaskExcutor(amqp)
-	case ml.BuzzReport == amqp.BuzzType:
+	case bizType.WorkReport == amqp.BuzzType:
 		buzz.ReportExcutor(amqp)
-	case ml.BuzzWorkflow == amqp.BuzzType:
+	case bizType.Approval == amqp.BuzzType:
 		buzz.WorkflowExcutor(amqp)
 	default:
 
