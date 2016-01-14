@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/astaxie/beego/utils"
 	ml "loyocloud-infrastructure/tmodels"
 	bizType "loyocloud-infrastructure/tmodels/enum/biztype"
 	"loyocloud-notify-client/amqp"
 	"loyocloud-notify-client/buzz"
+
+	"github.com/astaxie/beego/utils"
 )
 
 type AmqpNotify struct {
